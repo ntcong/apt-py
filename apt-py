@@ -16,16 +16,21 @@ def get_name(url):
 
 def download(url,part=(0,0)):
     print 'Downloading %s of %s:'%part, get_name(url)
-    p = subprocess.Popen(['aria2c','--dir='+DIR,url])
-    p.wait()
-    if p.poll()==0:#if there isn't any error
-        print 
-        return True
+    try:
+        p = subprocess.Popen(['aria2c','--dir='+DIR,url])
+        p.wait()
+    
+        if p.poll()==0:#if there isn't any error
+            print 
+            return True
+    except KeyboardInterrupt:
+        pass
     try:#otherwise we will remove the file
         print 'Error orcur...removing file'
         os.remove(DIR+get_name(url))
     except OSError:
         pass
+
 
 
 print 'apt-py....'
@@ -45,6 +50,7 @@ if len(sys.argv)!= 1 and sys.argv[1] in ['dist-upgrade','upgrade','install']:
     for url in url_lists:
         current +=1
         download(url,(current,num_url))
+            
 
 #after download all the file, run apt-get
 try:
@@ -52,4 +58,3 @@ try:
     p.wait()
 except KeyboardInterrupt:
     print "\nKeyboardInterrupt! Exitting"
-    
